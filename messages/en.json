@@ -1,0 +1,222 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "destinations": "Destinations",
+    "treks": "Treks",
+    "expeditions": "Expeditions",
+    "booking": "Booking",
+    "blog": "Blog",
+    "login": "Login",
+    "signup": "Sign Up",
+    "search": "Search",
+    "menu": "Menu",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "home": {
+    "hero": {
+      "title": "Explore the World You Have Never Seen",
+      "subtitle": "Book your next trekking adventure with Open Door Expedition",
+      "cta": "Book Now"
+    },
+    "featured": {
+      "title": "Featured Destinations",
+      "subtitle": "Explore our most popular trekking destinations"
+    },
+    "categories": {
+      "title": "Adventure Categories",
+      "subtitle": "Find your perfect adventure"
+    },
+    "testimonials": {
+      "title": "What Our Customers Say",
+      "subtitle": "Read testimonials from our satisfied customers"
+    },
+    "newsletter": {
+      "title": "Subscribe to Our Newsletter",
+      "subtitle": "Get the latest updates and offers",
+      "placeholder": "Your email address",
+      "button": "Subscribe",
+      "success": "Thank you for subscribing!"
+    }
+  },
+  "booking": {
+    "title": "Book Your Adventure",
+    "subtitle": "Fill in the form below to book your adventure",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "participants": "Number of Participants",
+      "date": "Travel Date",
+      "destination": "Destination",
+      "requirements": "Special Requirements",
+      "terms": "I agree to the terms and conditions",
+      "payment": {
+        "title": "Payment Method",
+        "creditCard": "Credit Card",
+        "debitCard": "Debit Card",
+        "netBanking": "Net Banking",
+        "upi": "UPI"
+      },
+      "submit": "Complete Booking",
+      "success": "Booking Successful!",
+      "error": "There was an error processing your booking. Please try again."
+    }
+  },
+  "currency": {
+    "INR": "₹",
+    "USD": "$",
+    "EUR": "€",
+    "GBP": "£"
+  },
+  "Metadata": {
+    "package": {
+      "title": "Package Details",
+      "description": "Explore our adventure packages and treks with detailed information, itineraries, and booking options."
+    }
+  },
+  "PackageDetail": {
+    "overview": "Overview",
+    "highlights": "Highlights",
+    "itinerary": "Itinerary",
+    "inclusionsExclusions": "Inclusions & Exclusions",
+    "inclusions": "Inclusions",
+    "exclusions": "Exclusions",
+    "duration": "Duration",
+    "difficulty": "Difficulty",
+    "groupSize": "Group Size",
+    "bestTime": "Best Time",
+    "day": "Day",
+    "meals": "Meals",
+    "accommodation": "Accommodation",
+    "backToPackages": "Back to Packages",
+    "errors": {
+      "fetchFailed": "Failed to load package details. Please try again later.",
+      "notFound": "Package Not Found",
+      "unavailable": "This package is currently unavailable or does not exist."
+    }
+  },
+  "BookingForm": {
+    "title": "Book This Package",
+    "price": "Price",
+    "perPerson": "per person",
+    "startingFrom": "starting from",
+    "selectDate": "Select Date",
+    "travelers": "Travelers",
+    "adult": "Adult",
+    "child": "Child",
+    "couponCode": "Coupon Code",
+    "apply": "Apply",
+    "totalAmount": "Total Amount",
+    "bookNow": "Book Now",
+    "contactInfo": "Contact Information",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "specialRequests": "Special Requests (Optional)",
+    "paymentMethod": "Payment Method",
+    "creditCard": "Credit Card",
+    "debitCard": "Debit Card",
+    "upi": "UPI",
+    "netBanking": "Net Banking",
+    "cardNumber": "Card Number",
+    "expiryDate": "Expiry Date",
+    "cvv": "CVV",
+    "nameOnCard": "Name on Card",
+    "upiId": "UPI ID",
+    "selectBank": "Select Bank",
+    "termsConditions": "I agree to the terms and conditions",
+    "proceedToPayment": "Proceed to Payment",
+    "confirmBooking": "Confirm Booking",
+    "errors": {
+      "requiredField": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidPhone": "Please enter a valid phone number",
+      "invalidCard": "Please enter a valid card number",
+      "invalidExpiry": "Please enter a valid expiry date",
+      "invalidCvv": "Please enter a valid CVV",
+      "invalidUpi": "Please enter a valid UPI ID",
+      "termsRequired": "You must agree to the terms and conditions",
+      "invalidCoupon": "Invalid coupon code",
+      "expiredCoupon": "This coupon has expired",
+      "paymentFailed": "Payment failed. Please try again."
+    },
+    "success": {
+      "couponApplied": "Coupon applied successfully! You saved {amount}.",
+      "bookingConfirmed": "Booking confirmed! Your booking ID is {bookingId}."
+    }
+  },
+  "PackagesPage": {
+    "title": "Our Packages",
+    "subtitle": "Explore our curated collection of adventure packages and treks",
+    "filter": {
+      "all": "All",
+      "treks": "Treks",
+      "expeditions": "Expeditions",
+      "charDham": "Char Dham",
+      "pilgrimage": "Pilgrimage",
+      "wildlife": "Wildlife"
+    },
+    "sort": {
+      "label": "Sort by",
+      "popularity": "Popularity",
+      "priceLowToHigh": "Price: Low to High",
+      "priceHighToLow": "Price: High to Low",
+      "duration": "Duration"
+    },
+    "search": "Search packages...",
+    "noResults": "No packages found matching your criteria.",
+    "loadMore": "Load More",
+    "loading": "Loading packages...",
+    "error": "Failed to load packages. Please try again later."
+  },
+  "PackageCard": {
+    "duration": "{duration} Days",
+    "difficulty": "Difficulty: {level}",
+    "viewDetails": "View Details",
+    "bookNow": "Book Now"
+  },
+  "PriceFormatter": {
+    "showAllCurrencies": "Show all currencies",
+    "hideAllCurrencies": "Hide all currencies"
+  },
+  "footer": {
+    "about": {
+      "title": "About Open Door Expedition",
+      "description": "We are a team of passionate trekkers and adventurers dedicated to providing you with the best trekking experience."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "address": "123 Adventure Street, Mountain View, CA 94043",
+      "phone": "+1 (123) 456-7890",
+      "email": "info@opendoorexpedition.com"
+    },
+    "links": {
+      "title": "Quick Links",
+      "home": "Home",
+      "about": "About",
+      "destinations": "Destinations",
+      "treks": "Treks",
+      "expeditions": "Expeditions",
+      "blog": "Blog",
+      "contact": "Contact"
+    },
+    "social": {
+      "title": "Follow Us",
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "youtube": "YouTube"
+    },
+    "copyright": "© 2023 Open Door Expedition. All rights reserved."
+  }
+}

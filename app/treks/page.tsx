@@ -1,0 +1,414 @@
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, Calendar, MapPin, Users } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+export default function TreksPage() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <section className="relative h-[50vh] flex items-center">
+        <Image
+          src="/placeholder.svg?height=1080&width=1920&query=himalayan mountain trekking group"
+          alt="Dream Go India Treks"
+          fill
+          priority
+          className="object-cover brightness-[0.7]"
+        />
+        <div className="container relative z-10 px-4 md:px-6">
+          <div className="max-w-3xl space-y-4">
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">Our Treks</h1>
+            <p className="text-xl text-white/90">Discover the best trekking experiences across India</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Trek Filters */}
+      <section className="py-8 bg-white border-b">
+        <div className="container px-4 md:px-6">
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+              <TabsTrigger value="all">All Treks</TabsTrigger>
+              <TabsTrigger value="winter">Winter Treks</TabsTrigger>
+              <TabsTrigger value="summer">Summer Treks</TabsTrigger>
+              <TabsTrigger value="monsoon">Monsoon Treks</TabsTrigger>
+              <TabsTrigger value="weekend">Weekend Treks</TabsTrigger>
+            </TabsList>
+
+            <div className="mt-8">
+              <TabsContent value="all" className="mt-0">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {allTreks.map((trek) => (
+                    <TrekCard key={trek.slug} trek={trek} />
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="winter" className="mt-0">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {allTreks
+                    .filter((trek) => trek.seasons.includes("Winter"))
+                    .map((trek) => (
+                      <TrekCard key={trek.slug} trek={trek} />
+                    ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="summer" className="mt-0">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {allTreks
+                    .filter((trek) => trek.seasons.includes("Summer"))
+                    .map((trek) => (
+                      <TrekCard key={trek.slug} trek={trek} />
+                    ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="monsoon" className="mt-0">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {allTreks
+                    .filter((trek) => trek.seasons.includes("Monsoon"))
+                    .map((trek) => (
+                      <TrekCard key={trek.slug} trek={trek} />
+                    ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="weekend" className="mt-0">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {allTreks
+                    .filter((trek) => trek.duration <= 3)
+                    .map((trek) => (
+                      <TrekCard key={trek.slug} trek={trek} />
+                    ))}
+                </div>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+      </section>
+
+      {/* Popular Destinations */}
+      <section className="py-16 bg-gray-50">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="space-y-2">
+              <div className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
+                <MapPin className="mr-1 h-3.5 w-3.5" />
+                <span>Destinations</span>
+              </div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Popular Trekking Destinations</h2>
+              <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Explore treks by region across India
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-8">
+            {destinations.map((destination) => (
+              <Link
+                key={destination.id}
+                href={`/destinations/${destination.slug}`}
+                className="group relative overflow-hidden rounded-xl"
+              >
+                <div className="aspect-[4/3] w-full overflow-hidden">
+                  <Image
+                    src={destination.image || "/placeholder.svg"}
+                    alt={destination.name}
+                    width={600}
+                    height={400}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/10" />
+                  <div className="absolute inset-0 flex flex-col justify-end p-6">
+                    <h3 className="text-xl font-bold text-white">{destination.name}</h3>
+                    <p className="mt-2 text-sm text-white/90">{destination.description}</p>
+                    <div className="mt-4 flex items-center text-sm font-medium text-white">
+                      <span>View Treks</span>
+                      <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-12 bg-red-50">
+        <div className="container px-4 md:px-6 text-center">
+          <h2 className="text-2xl font-bold mb-4">Can't Find What You're Looking For?</h2>
+          <p className="text-gray-700 max-w-2xl mx-auto mb-6">
+            Contact us for custom trek itineraries or to inquire about any specific trek that's not listed.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/contact">
+              <Button size="lg" className="bg-red-600 hover:bg-red-700">
+                Contact Us
+              </Button>
+            </Link>
+            <Link href="/custom-trek">
+              <Button size="lg" variant="outline">
+                Request Custom Trek
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+interface TrekCardProps {
+  trek: {
+    slug: string
+    title: string
+    location: string
+    duration: number
+    difficulty: string
+    price: string
+    image: string
+    isPopular?: boolean
+    tags: string[]
+    seasons: string[]
+  }
+}
+
+function TrekCard({ trek }: TrekCardProps) {
+  return (
+    <div className="group relative overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md">
+      {trek.isPopular && (
+        <div className="absolute top-4 left-4 z-20">
+          <span className="inline-block bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">POPULAR</span>
+        </div>
+      )}
+      <div className="relative h-60 w-full overflow-hidden">
+        <Image
+          src={trek.image || "/placeholder.svg"}
+          alt={trek.title}
+          fill
+          className="object-cover transition-transform group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-4 left-4 right-4">
+          <h3 className="text-xl font-bold text-white">{trek.title}</h3>
+          <div className="flex items-center gap-2 text-white/90 text-sm mt-1">
+            <MapPin className="h-4 w-4" />
+            <span>{trek.location}</span>
+          </div>
+        </div>
+      </div>
+      <div className="p-4">
+        <div className="flex flex-wrap gap-2 mb-3">
+          {trek.tags.map((tag, index) => (
+            <Badge key={index} variant="outline" className="bg-gray-100">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Calendar className="h-4 w-4" />
+            <span>{trek.duration} Days</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Users className="h-4 w-4" />
+            <span>Difficulty: {trek.difficulty}</span>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            <span className="text-sm text-gray-500">Starting from</span>
+            <p className="text-lg font-bold text-red-600">{trek.price}</p>
+          </div>
+          <Link href={`/treks/${trek.slug}`}>
+            <Button size="sm" className="bg-red-600 hover:bg-red-700">
+              View Details
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const destinations = [
+  {
+    id: 1,
+    name: "Uttarakhand",
+    slug: "uttarakhand",
+    description: "Land of Gods with stunning Himalayan views",
+    image: "/placeholder.svg?height=600&width=800&query=uttarakhand mountains himalaya landscape",
+  },
+  {
+    id: 2,
+    name: "Himachal Pradesh",
+    slug: "himachal-pradesh",
+    description: "Beautiful valleys and snow-capped peaks",
+    image: "/placeholder.svg?height=600&width=800&query=himachal pradesh mountains landscape",
+  },
+  {
+    id: 3,
+    name: "Kashmir",
+    slug: "kashmir",
+    description: "Paradise on Earth with breathtaking landscapes",
+    image: "/placeholder.svg?height=600&width=800&query=kashmir mountains lakes landscape",
+  },
+  {
+    id: 4,
+    name: "Sikkim & Northeast",
+    slug: "sikkim-northeast",
+    description: "Eastern Himalayan gems with diverse flora and fauna",
+    image: "/placeholder.svg?height=600&width=800&query=sikkim mountains kanchenjunga landscape",
+  },
+]
+
+const allTreks = [
+  {
+    slug: "kedarkantha-trek",
+    title: "Kedarkantha Trek",
+    location: "Uttarkashi, Uttarakhand",
+    duration: 6,
+    difficulty: "Easy-Moderate",
+    price: "₹8,999",
+    image: "/placeholder.svg?height=600&width=800&query=kedarkantha trek snow mountains uttarakhand",
+    isPopular: true,
+    tags: ["Winter Trek", "Snow Trek", "Summit Trek"],
+    seasons: ["Winter"],
+  },
+  {
+    slug: "brahmatal-trek",
+    title: "Brahmatal Trek",
+    location: "Chamoli, Uttarakhand",
+    duration: 6,
+    difficulty: "Moderate",
+    price: "₹9,499",
+    image: "/placeholder.svg?height=600&width=800&query=brahmatal trek uttarakhand snow mountains",
+    isPopular: true,
+    tags: ["Winter Trek", "Lake Trek", "Forest Trek"],
+    seasons: ["Winter"],
+  },
+  {
+    slug: "har-ki-dun-trek",
+    title: "Har Ki Dun Trek",
+    location: "Uttarkashi, Uttarakhand",
+    duration: 8,
+    difficulty: "Moderate",
+    price: "₹12,999",
+    image: "/placeholder.svg?height=600&width=800&query=har ki dun valley trek uttarakhand",
+    isPopular: true,
+    tags: ["Valley Trek", "Cultural Trek", "Summer Trek"],
+    seasons: ["Summer", "Autumn"],
+  },
+  {
+    slug: "valley-of-flowers-trek",
+    title: "Valley of Flowers Trek",
+    location: "Chamoli, Uttarakhand",
+    duration: 6,
+    difficulty: "Easy-Moderate",
+    price: "₹9,999",
+    image: "/placeholder.svg?height=600&width=800&query=valley of flowers uttarakhand monsoon",
+    isPopular: false,
+    tags: ["Monsoon Trek", "UNESCO Site", "Flower Valley"],
+    seasons: ["Monsoon"],
+  },
+  {
+    slug: "roopkund-trek",
+    title: "Roopkund Trek",
+    location: "Chamoli, Uttarakhand",
+    duration: 8,
+    difficulty: "Difficult",
+    price: "₹14,999",
+    image: "/placeholder.svg?height=600&width=800&query=roopkund trek skeleton lake uttarakhand",
+    isPopular: false,
+    tags: ["Mystery Lake", "High Altitude", "Challenging"],
+    seasons: ["Summer", "Autumn"],
+  },
+  {
+    slug: "dayara-bugyal-trek",
+    title: "Dayara Bugyal Trek",
+    location: "Uttarkashi, Uttarakhand",
+    duration: 5,
+    difficulty: "Easy",
+    price: "₹7,999",
+    image: "/placeholder.svg?height=600&width=800&query=dayara bugyal meadows uttarakhand",
+    isPopular: false,
+    tags: ["Meadow Trek", "Beginner Friendly", "Weekend Trek"],
+    seasons: ["Summer", "Winter"],
+  },
+  {
+    slug: "chopta-chandrashila-trek",
+    title: "Chopta Chandrashila Trek",
+    location: "Rudraprayag, Uttarakhand",
+    duration: 5,
+    difficulty: "Easy-Moderate",
+    price: "₹8,499",
+    image: "/placeholder.svg?height=600&width=800&query=chopta chandrashila tungnath temple trek",
+    isPopular: false,
+    tags: ["Temple Trek", "Summit Trek", "Weekend Trek"],
+    seasons: ["Summer", "Winter"],
+  },
+  {
+    slug: "kuari-pass-trek",
+    title: "Kuari Pass Trek",
+    location: "Chamoli, Uttarakhand",
+    duration: 6,
+    difficulty: "Moderate",
+    price: "₹9,999",
+    image: "/placeholder.svg?height=600&width=800&query=kuari pass trek uttarakhand nanda devi view",
+    isPopular: false,
+    tags: ["Mountain Pass", "Panoramic Views", "Lord Curzon Trail"],
+    seasons: ["Summer", "Winter"],
+  },
+  {
+    slug: "nag-tibba-trek",
+    title: "Nag Tibba Trek",
+    location: "Tehri Garhwal, Uttarakhand",
+    duration: 2,
+    difficulty: "Easy",
+    price: "₹4,999",
+    image: "/placeholder.svg?height=600&width=800&query=nag tibba trek weekend uttarakhand",
+    isPopular: false,
+    tags: ["Weekend Trek", "Beginner Friendly", "Summit Trek"],
+    seasons: ["Summer", "Winter", "Autumn"],
+  },
+  {
+    slug: "hampta-pass-trek",
+    title: "Hampta Pass Trek",
+    location: "Kullu, Himachal Pradesh",
+    duration: 5,
+    difficulty: "Moderate",
+    price: "₹9,999",
+    image: "/placeholder.svg?height=600&width=800&query=hampta pass trek himachal pradesh",
+    isPopular: false,
+    tags: ["Mountain Pass", "Contrasting Landscapes", "Chandratal Lake"],
+    seasons: ["Summer", "Monsoon"],
+  },
+  {
+    slug: "beas-kund-trek",
+    title: "Beas Kund Trek",
+    location: "Manali, Himachal Pradesh",
+    duration: 4,
+    difficulty: "Easy",
+    price: "₹6,999",
+    image: "/placeholder.svg?height=600&width=800&query=beas kund trek manali himachal pradesh",
+    isPopular: false,
+    tags: ["Glacial Lake", "Beginner Friendly", "Weekend Trek"],
+    seasons: ["Summer", "Monsoon"],
+  },
+  {
+    slug: "kashmir-great-lakes-trek",
+    title: "Kashmir Great Lakes Trek",
+    location: "Sonamarg, Kashmir",
+    duration: 7,
+    difficulty: "Moderate-Difficult",
+    price: "₹15,999",
+    image: "/placeholder.svg?height=600&width=800&query=kashmir great lakes trek alpine lakes",
+    isPopular: true,
+    tags: ["Alpine Lakes", "Meadows", "High Altitude"],
+    seasons: ["Summer"],
+  },
+]
