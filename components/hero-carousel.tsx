@@ -156,7 +156,7 @@ export default function ModernHeroSection({
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex items-center py-8 lg:py-0">
+      <div className="relative z-10 min-h-screen flex items-center py-8 md:py-0 lg:py-0">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center h-full py-20">
             {/* Left Content */}
