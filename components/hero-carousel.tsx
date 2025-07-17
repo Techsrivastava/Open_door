@@ -140,7 +140,7 @@ export default function ModernHeroSection({
   }
 
   return (
-    <section className={`w-full min-h-screen relative overflow-hidden ${className}`}>
+    <section className={`w-full min-h-screen pt-20 md:pt-0 relative overflow-hidden ${className}`}>
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
