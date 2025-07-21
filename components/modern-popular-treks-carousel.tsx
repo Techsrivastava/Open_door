@@ -286,16 +286,11 @@ const ModernTrekCard = ({ trek, index }: { trek: any; index: number }) => {
         {/* Highlights */}
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-gray-900">Trek Highlights:</h4>
-          <div className="flex flex-wrap gap-2">
+          <ul className="list-disc list-inside space-y-1 text-orange-800 text-sm">
             {trek.highlights.map((highlight: string, idx: number) => (
-              <span
-                key={idx}
-                className="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-medium border border-orange-200"
-              >
-                {highlight}
-              </span>
+              <li key={idx}>{highlight}</li>
             ))}
-          </div>
+          </ul>
         </div>
 
         {/* Price and CTA */}
@@ -425,7 +420,70 @@ const TrekCarousel = ({ treks, title, subtitle }: { treks: any[]; title: string;
   )
 }
 
-export default function TrekSection() {
+// Change export to accept category prop
+type TrekSectionProps = { category?: string }
+
+export default function TrekSection({ category = "Trekking" }: TrekSectionProps) {
+  const [treks, setTreks] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Map API data to card format
+  function mapTrekData(apiTrek: any) {
+    // Use cardImage if available, else fallback
+    let image = '/placeholder.svg';
+    if (apiTrek.images) {
+      if (typeof apiTrek.images === 'object' && 'cardImage' in apiTrek.images) {
+        image = apiTrek.images.cardImage || image;
+      } else if (Array.isArray(apiTrek.images) && apiTrek.images.length > 0) {
+        image = apiTrek.images[0];
+      }
+    }
+    // Use offerPrice if price is missing
+    const price = apiTrek.offerPrice || apiTrek.price || 0;
+    // Use inclusions as highlights if available
+    const highlights = apiTrek.inclusions || apiTrek.highlights || [
+      apiTrek.description?.split('.')[0] || 'Amazing adventure experience',
+      'Professional guides and support',
+      'Comfortable accommodation',
+    ].filter(Boolean);
+    return {
+      ...apiTrek,
+      id: apiTrek._id,
+      title: apiTrek.name || 'Trek',
+      location: apiTrek.location || apiTrek.city || apiTrek.state || '',
+      duration: apiTrek.duration || 'N/A',
+      difficulty: apiTrek.difficulty || 'Easy',
+      price: `₹${price.toLocaleString()}`,
+      originalPrice: apiTrek.originalPrice ? `₹${apiTrek.originalPrice}` : '',
+      rating: apiTrek.rating || 4.5,
+      reviews: apiTrek.reviews || 0,
+      image,
+      slug: apiTrek.slug || apiTrek._id,
+      altitude: apiTrek.altitude || '',
+      bestTime: apiTrek.bestTime || '',
+      photos: Array.isArray(apiTrek.images?.gallery) ? apiTrek.images.gallery.length : 0,
+      isPopular: apiTrek.isPopular !== undefined ? apiTrek.isPopular : true,
+      highlights: highlights.slice(0, 3),
+      temperature: apiTrek.temperature || '',
+    };
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    setError(null)
+    fetch(`https://trippy-backend-qequ.onrender.com/api/packages?category=${encodeURIComponent(category)}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to fetch treks")
+        const data = await res.json()
+        setTreks((data.data || []).map(mapTrekData))
+      })
+      .catch((err) => {
+        setError(err.message || "Unknown error")
+      })
+      .finally(() => setLoading(false))
+  }, [category])
+
   return (
     <section className="relative bg-white py-20 overflow-hidden">
       {/* Background Elements */}
@@ -433,12 +491,17 @@ export default function TrekSection() {
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-100/20 to-transparent rounded-full blur-3xl" />
 
       <div className="relative container mx-auto px-4 md:px-6">
+        {loading ? (
+          <div className="text-center text-lg py-20">Loading treks...</div>
+        ) : error ? (
+          <div className="text-center text-red-500 py-20">{error}</div>
+        ) : (
         <TrekCarousel
-          treks={popularTreks}
+            treks={treks}
           title="Discover Our Popular Treks"
           subtitle="Explore the most sought-after trekking destinations in India with expert guides and premium services"
         />
-
+        )}
         {/* CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

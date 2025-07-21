@@ -129,7 +129,7 @@ export default function ModernHeroSection({
 
   if (!slides.length) {
     return (
-      <section className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+      <section className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 pt-16 md:pt-0">
         <div className="text-center text-white">
           <Mountain className="w-16 h-16 mx-auto mb-4 text-slate-400" />
           <h1 className="text-4xl font-bold mb-4">No expeditions available</h1>
@@ -140,7 +140,7 @@ export default function ModernHeroSection({
   }
 
   return (
-    <section className={`w-full min-h-screen pt-20 md:pt-0 relative overflow-hidden ${className}`}>
+    <section className={`w-full min-h-screen pt-16 md:pt-0 relative overflow-hidden ${className}`}>
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image

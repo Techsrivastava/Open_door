@@ -19,6 +19,7 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import apiService from "@/lib/services/api-service";
 
 // Custom Button Component
 const Button = ({
@@ -133,6 +134,13 @@ const charDhamPackages = [
   },
 ]
 
+// Utility function for discount calculation
+function getPercentOff(originalPrice: any, offerPrice: any) {
+  const original = Number(originalPrice?.toString().replace(/,/g, '')) || 0;
+  const offer = Number(offerPrice?.toString().replace(/,/g, '')) || 0;
+  return original && offer ? Math.round(((original - offer) / original) * 100) : 0;
+}
+
 // JustTravel Style Package Card
 const JustTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
   const [isLiked, setIsLiked] = useState(false)
@@ -147,8 +155,8 @@ const JustTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={pkg.image || "/placeholder.svg"}
-          alt={pkg.title}
+          src={pkg.image || pkg.images?.cardImage || "/placeholder.svg"}
+          alt={pkg.name || pkg.title || "Package image"}
           width={400}
           height={240}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -162,9 +170,11 @@ const JustTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
           {pkg.isPopular && (
             <span className="bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-semibold">Popular</span>
           )}
-          <span className="bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-            {pkg.discount}% OFF
-          </span>
+          {getPercentOff(pkg.originalPrice, pkg.offerPrice) > 0 && (
+            <span className="bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+              {getPercentOff(pkg.originalPrice, pkg.offerPrice)}% OFF
+            </span>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -215,17 +225,23 @@ const JustTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
           </div>
           <div className="flex items-center gap-1">
             <Users className="w-3 h-3" />
-            <span>{pkg.groupSize}</span>
+            <span>{parseInt(pkg.maxParticipants) || pkg.groupSize || 'N/A'} People</span>
           </div>
           <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
-            <span>{pkg.bestTime}</span>
+            <Award className="w-3 h-3" />
+            <span>{
+              (pkg.trekInfo && Array.isArray(pkg.trekInfo) &&
+                (pkg.trekInfo.find((info: any) =>
+                  typeof info.title === 'string' && info.title.trim().toLowerCase() === 'grade')?.value))
+              || pkg.difficulty
+              || 'N/A'
+            }</span>
           </div>
         </div>
 
         {/* Highlights */}
         <div className="flex flex-wrap gap-1">
-          {pkg.highlights.slice(0, 3).map((highlight: string, idx: number) => (
+          {(pkg.highlights || []).slice(0, 3).map((highlight: string, idx: number) => (
             <span key={idx} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium">
               {highlight}
             </span>
@@ -235,8 +251,8 @@ const JustTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
         {/* Price and CTA */}
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold text-gray-900">₹{pkg.price.toLocaleString()}</span>
-            <span className="text-sm text-gray-500 line-through">₹{pkg.originalPrice.toLocaleString()}</span>
+            <span className="text-xl font-bold text-gray-900">₹{(Number(pkg.offerPrice?.toString().replace(/,/g, '')) || 0).toLocaleString()}</span>
+            <span className="text-sm text-gray-500 line-through">₹{(Number(pkg.originalPrice?.toString().replace(/,/g, '')) || 0).toLocaleString()}</span>
           </div>
           <Button size="sm" className="px-4">
             Book Now
@@ -260,8 +276,8 @@ const CompactTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
         {/* Image Section - Smaller */}
         <div className="relative w-32 h-32 flex-shrink-0">
           <Image
-            src={pkg.image || "/placeholder.svg"}
-            alt={pkg.title}
+            src={pkg.image || pkg.images?.cardImage || "/placeholder.svg"}
+            alt={pkg.name || pkg.title || "Package image"}
             width={128}
             height={128}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -295,8 +311,8 @@ const CompactTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
 
           <div className="flex items-center justify-between">
             <div className="flex items-baseline gap-1">
-              <span className="text-lg font-bold text-gray-900">₹{pkg.price.toLocaleString()}</span>
-              <span className="text-xs text-gray-500 line-through">₹{pkg.originalPrice.toLocaleString()}</span>
+              <span className="text-lg font-bold text-gray-900">₹{(Number(pkg.offerPrice?.toString().replace(/,/g, '')) || 0).toLocaleString()}</span>
+              <span className="text-xs text-gray-500 line-through">₹{(Number(pkg.originalPrice?.toString().replace(/,/g, '')) || 0).toLocaleString()}</span>
             </div>
             <Button size="sm" variant="outline" className="text-xs px-3 py-1 bg-transparent">
               View Details
@@ -304,12 +320,20 @@ const CompactTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
           </div>
         </div>
       </div>
+
+      {/* Inclusions List (bulleted, max 3) */}
+      <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 px-4 pb-2">
+        {(pkg.inclusions || []).slice(0, 3).map((inc: string, idx: number) => (
+          <li key={idx}>{inc}</li>
+        ))}
+      </ul>
     </motion.div>
   )
 }
 
 // Premium Card Style
 const PremiumTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
+  const percentOff = getPercentOff(pkg.originalPrice, pkg.offerPrice);
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -320,8 +344,8 @@ const PremiumTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
       {/* Image Section */}
       <div className="relative h-56 overflow-hidden">
         <Image
-          src={pkg.image || "/placeholder.svg"}
-          alt={pkg.title}
+          src={pkg.image || pkg.images?.cardImage || "/placeholder.svg"}
+          alt={pkg.name || pkg.title || "Package image"}
           width={400}
           height={224}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -334,8 +358,10 @@ const PremiumTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
         <div className="absolute top-4 right-4 bg-white rounded-2xl p-3 shadow-lg">
           <div className="text-center">
             <div className="text-xs text-gray-500 mb-1">Starting from</div>
-            <div className="text-lg font-bold text-gray-900">₹{pkg.price.toLocaleString()}</div>
-            <div className="text-xs text-green-600 font-semibold">{pkg.discount}% OFF</div>
+            <div className="text-lg font-bold text-gray-900">₹{(Number(pkg.offerPrice?.toString().replace(/,/g, '')) || 0).toLocaleString()}</div>
+            {percentOff > 0 && (
+              <div className="text-xs text-green-600 font-semibold">{percentOff}% OFF</div>
+            )}
           </div>
         </div>
 
@@ -381,23 +407,24 @@ const PremiumTravelCard = ({ pkg, index }: { pkg: any; index: number }) => {
           <div className="space-y-1">
             <Award className="w-4 h-4 text-orange-500 mx-auto" />
             <div className="text-xs text-gray-600">Difficulty</div>
-            <div className="text-sm font-semibold text-gray-900">{pkg.difficulty}</div>
+            <div className="text-sm font-semibold text-gray-900">{
+              (pkg.trekInfo && Array.isArray(pkg.trekInfo) &&
+                (pkg.trekInfo.find((info: any) =>
+                  typeof info.title === 'string' && info.title.trim().toLowerCase() === 'grade')?.value))
+              || pkg.difficulty
+              || 'N/A'
+            }</div>
           </div>
         </div>
 
         {/* Highlights */}
         <div className="space-y-2">
           <div className="text-sm font-semibold text-gray-900">What's Included:</div>
-          <div className="flex flex-wrap gap-2">
-            {pkg.highlights.map((highlight: string, idx: number) => (
-              <span
-                key={idx}
-                className="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-medium border border-orange-200"
-              >
-                {highlight}
-              </span>
+          <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+            {(pkg.inclusions || []).slice(0, 3).map((inc: string, idx: number) => (
+              <li key={idx}>{inc}</li>
             ))}
-          </div>
+          </ul>
         </div>
 
         {/* CTA */}
@@ -502,7 +529,7 @@ const ModernCarousel = ({
             }}
           >
             {packages.map((pkg, index) => (
-              <div key={pkg.id} className="flex-shrink-0 px-3" style={{ width: `${100 / itemsPerView}%` }}>
+              <div key={pkg._id || `${index}-${pkg.name}`} className="flex-shrink-0 px-3" style={{ width: `${100 / itemsPerView}%` }}>
                 <CardComponent pkg={pkg} index={index} />
               </div>
             ))}
@@ -527,10 +554,36 @@ const ModernCarousel = ({
 }
 
 export default function CharDhamSection() {
+  const [charDhamPackages, setCharDhamPackages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    apiService
+      .getPackages({ category: "Char Dham" })
+      .then((res: any) => setCharDhamPackages(res.data || []))
+      .catch(() => setError("Failed to load Char Dham packages."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <span className="animate-spin h-8 w-8 border-4 border-orange-500 border-t-transparent rounded-full inline-block" />
+      </div>
+    );
+  }
+  if (error) {
+    return <div className="text-center text-red-600 py-20">{error}</div>;
+  }
+  if (!charDhamPackages.length) {
+    return <div className="text-center text-gray-500 py-20">No Char Dham packages available.</div>;
+  }
+
   return (
     <div className="bg-gray-50 py-20 space-y-20">
       <div className="container mx-auto px-4 md:px-6">
-        {/* JustTravel Style Cards */}
         <ModernCarousel
           packages={charDhamPackages}
           title="Char Dham Yatra Packages"
@@ -538,9 +591,7 @@ export default function CharDhamSection() {
           cardStyle="default"
         />
       </div>
-
       <div className="container mx-auto px-4 md:px-6">
-        {/* Compact Style Cards */}
         <ModernCarousel
           packages={charDhamPackages}
           title="Quick Browse Packages"
@@ -548,9 +599,7 @@ export default function CharDhamSection() {
           cardStyle="compact"
         />
       </div>
-
       <div className="container mx-auto px-4 md:px-6">
-        {/* Premium Style Cards */}
         <ModernCarousel
           packages={charDhamPackages}
           title="Premium Yatra Experiences"
@@ -558,7 +607,6 @@ export default function CharDhamSection() {
           cardStyle="premium"
         />
       </div>
-
       {/* CTA Section */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -578,5 +626,5 @@ export default function CharDhamSection() {
         </Link>
       </motion.div>
     </div>
-  )
+  );
 }

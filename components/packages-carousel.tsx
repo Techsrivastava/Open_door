@@ -3,29 +3,37 @@
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Calendar, MapPin } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar, MapPin, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface Package {
-  slug: string
-  title: string
-  subtitle: string
-  image: string
-  duration: string
-  location: string
-  price: string
-  highlights: string[]
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  duration: number;
+  location: string;
+  images: string[];
+  category: string;
+  rating: number;
+  reviews: number;
+  slug?: string;
+  highlights?: string[];
+  difficulty?: string;
+  maxGroupSize?: number;
+  offerPrice?: number; // Added for offerPrice
+  inclusions?: string[]; // Added for inclusions
 }
 
 export default function PackagesCarousel({
   packages,
-  title,
-  subtitle,
+  title = "Featured Packages",
+  subtitle = "Handpicked adventures for the ultimate experience",
 }: {
   packages: Package[]
-  title: string
-  subtitle: string
+  title?: string
+  subtitle?: string
 }) {
   const [scrollPosition, setScrollPosition] = useState(0)
   const carouselRef = useRef<HTMLDivElement>(null)
@@ -75,6 +83,64 @@ export default function PackagesCarousel({
     }
   }
 
+  // Transform API data to component format
+  const transformPackage = (pkg: Package) => {
+    if (!pkg || typeof pkg !== 'object') {
+      return null;
+    }
+
+    // Use cardImage if available, else fallback
+    let image = '/placeholder-package.jpg';
+    if (pkg.images) {
+      if (typeof pkg.images === 'object' && 'cardImage' in pkg.images) {
+        image = pkg.images.cardImage || image;
+      } else if (Array.isArray(pkg.images) && pkg.images.length > 0) {
+        image = pkg.images[0];
+      }
+    }
+
+    // Use offerPrice if price is missing
+    const price = pkg.offerPrice || pkg.price || 0;
+    // Use inclusions as highlights if available
+    const highlights = pkg.inclusions || pkg.highlights || [
+      pkg.description?.split('.')[0] || 'Amazing adventure experience',
+      'Professional guides and support',
+      'Comfortable accommodation',
+    ].filter(Boolean);
+
+    return {
+      ...pkg,
+      title: pkg.name || 'Package',
+      subtitle: pkg.description?.split('.')[0] || (pkg.category && pkg.category.name) || 'Adventure Package',
+      image,
+      duration: pkg.duration || 'N/A',
+      price: `₹${price.toLocaleString()}`,
+      highlights: highlights.slice(0, 3),
+      rating: pkg.rating || 4.5,
+      reviews: pkg.reviews || 0,
+      location: pkg.location || pkg.city || pkg.state || '',
+      slug: pkg.slug || pkg._id,
+    };
+  };
+
+  const transformedPackages = packages
+    .map(transformPackage)
+    .filter(Boolean); // Remove any null packages
+
+  if (!packages || packages.length === 0) {
+    return (
+      <div className="relative">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">{title}</h2>
+          <p className="mt-2 text-lg text-gray-600">{subtitle}</p>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-gray-500">No packages available at the moment.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <div className="mb-8 text-center">
@@ -103,23 +169,31 @@ export default function PackagesCarousel({
           onScroll={handleScroll}
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {packages.map((pkg, index) => (
+          {transformedPackages.map((pkg, index) => (
             <div
-              key={index}
+              key={pkg._id || index}
               data-card
               className="min-w-[300px] flex-shrink-0 snap-start rounded-lg border bg-white shadow-sm transition-all hover:shadow-md md:min-w-[350px]"
             >
               <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
                 <Image
-                  src={pkg.image || "/placeholder.svg"}
+                  src={pkg.image || "/placeholder-package.jpg"}
                   alt={pkg.title}
                   fill
                   className="object-cover transition-transform hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-xl font-bold text-white">{pkg.title}</h3>
-                  <p className="text-sm text-white/90">{pkg.subtitle}</p>
+                  <h3 className="text-xl font-bold text-white line-clamp-1">{pkg.title}</h3>
+                  <p className="text-sm text-white/90 line-clamp-1">{pkg.subtitle}</p>
+                </div>
+                {/* Rating badge */}
+                <div className="absolute top-2 right-2">
+                  <div className="flex items-center space-x-1 bg-black/70 text-white px-2 py-1 rounded">
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    <span className="text-xs">{pkg.rating || 4.5}</span>
+                    <span className="text-xs">({pkg.reviews || 0})</span>
+                  </div>
                 </div>
               </div>
               <div className="p-4">
@@ -130,15 +204,15 @@ export default function PackagesCarousel({
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <MapPin className="h-4 w-4" />
-                    <span>{pkg.location}</span>
+                    <span className="line-clamp-1">{pkg.location}</span>
                   </div>
                 </div>
                 <div className="mt-3 space-y-2">
                   <ul className="space-y-1">
-                    {pkg.highlights.slice(0, 3).map((highlight, idx) => (
+                    {(pkg.highlights || []).map((highlight, idx) => (
                       <li key={idx} className="flex items-start text-sm">
                         <span className="mr-2 mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
-                        <span className="text-gray-600">{highlight}</span>
+                        <span className="text-gray-600 line-clamp-1">{highlight}</span>
                       </li>
                     ))}
                   </ul>
@@ -148,7 +222,7 @@ export default function PackagesCarousel({
                     <span className="text-sm text-gray-500">Starting from</span>
                     <p className="text-lg font-bold text-secondary">{pkg.price}</p>
                   </div>
-                  <Link href={`/char-dham-yatra/packages/${pkg.slug}`}>
+                  <Link href={`/packages/${pkg._id}`}>
                     <Button size="sm" className="bg-secondary hover:bg-secondary/80">
                       View Details
                     </Button>

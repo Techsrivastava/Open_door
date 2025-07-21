@@ -49,10 +49,10 @@ const Button = ({
     "inline-flex items-center justify-center font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
 
   const variants = {
-    default: "bg-orange-500 hover:bg-orange-600 text-white shadow-sm hover:shadow-md focus:ring-orange-500 rounded-lg",
+    default: "bg-secondary hover:bg-secondary/90 text-white shadow-sm hover:shadow-md focus:ring-secondary rounded-lg",
     outline:
-      "border border-orange-500 text-orange-500 hover:bg-orange-50 bg-transparent focus:ring-orange-500 rounded-lg",
-    ghost: "text-gray-600 hover:text-orange-500 hover:bg-orange-50 focus:ring-orange-500 rounded-lg",
+      "border border-secondary text-secondary hover:bg-secondary/10 bg-transparent focus:ring-secondary rounded-lg",
+    ghost: "text-gray-600 hover:text-secondary hover:bg-secondary/10 focus:ring-secondary rounded-lg",
   }
 
   const sizes = {
@@ -78,8 +78,8 @@ const Badge = ({
   variant?: "default" | "outline" | "secondary"
 }) => {
   const variants = {
-    default: "bg-orange-500 text-white",
-    outline: "border border-orange-500 text-orange-500 bg-transparent",
+    default: "bg-secondary text-white",
+    outline: "border border-secondary text-secondary bg-transparent",
     secondary: "bg-gray-100 text-gray-800",
   }
 
@@ -101,7 +101,7 @@ const Avatar = ({
   const [imageError, setImageError] = useState(false)
 
   return (
-    <div className={`relative rounded-full overflow-hidden bg-gradient-to-br from-orange-500 to-red-600 ${className}`}>
+    <div className={`relative rounded-full overflow-hidden bg-gradient-to-br from-secondary to-red-600 ${className}`}>
       {src && !imageError ? (
         <img
           src={src || "/placeholder.svg"}
@@ -208,26 +208,12 @@ export default function ImprovedNavbar() {
         href: "/treks",
         icon: <Mountain className="w-4 h-4" />,
         description: "Adventure awaits",
-        isNew: true,
-        children: [
-          { name: "Winter Treks", href: "/treks/winter-treks", description: "Snow-covered adventures" },
-          { name: "Summer Treks", href: "/treks/summer-treks", description: "Perfect weather treks", isPopular: true },
-          { name: "Monsoon Treks", href: "/treks/monsoon-treks", description: "Lush green landscapes" },
-          { name: "Weekend Treks", href: "/treks/weekend-treks", description: "Quick getaways" },
-        ],
       },
       {
         name: "Expeditions",
         href: "/expeditions",
         icon: <Compass className="w-4 h-4" />,
         description: "Epic adventures",
-        children: [
-          { name: "Himalayan Expeditions", href: "/expeditions/himalayan", description: "Conquer the peaks" },
-          { name: "Trekking Expeditions", href: "/expeditions/trekking", description: "Multi-day adventures" },
-          { name: "Adventure Expeditions", href: "/expeditions/adventure", description: "Extreme sports" },
-          { name: "Cultural Expeditions", href: "/expeditions/cultural", description: "Immerse in culture" },
-          { name: "Wildlife Expeditions", href: "/expeditions/wildlife", description: "Nature encounters" },
-        ],
       },
       {
         name: "Char Dham",
@@ -344,8 +330,8 @@ export default function ImprovedNavbar() {
     return (
       <div className="w-full">
         <div
-          className={`flex items-center justify-between w-full p-4 rounded-xl transition-all duration-300 group hover:bg-orange-50 ${
-            isActive(item.href) ? "bg-orange-50 text-orange-600" : ""
+          className={`flex items-center justify-between w-full p-4 rounded-xl transition-all duration-300 group hover:bg-secondary/10 ${
+            isActive(item.href) ? "bg-secondary/10 text-secondary" : ""
           }`}
         >
           {hasChildren ? (
@@ -353,7 +339,7 @@ export default function ImprovedNavbar() {
               {item.icon && (
                 <div
                   className={`p-2 rounded-lg transition-all duration-300 ${
-                    isActive(item.href) ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-600"
+                    isActive(item.href) ? "bg-secondary/10 text-secondary" : "bg-gray-100 text-gray-600"
                   }`}
                 >
                   {item.icon}
@@ -362,19 +348,12 @@ export default function ImprovedNavbar() {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{item.name}</span>
-                  {item.isNew && <Badge className="text-xs px-2 py-0.5 bg-green-500">New</Badge>}
-                  {item.isPopular && (
-                    <Badge variant="outline" className="text-xs px-2 py-0.5 border-orange-300 text-orange-600">
-                      <Star className="w-3 h-3 mr-1" />
-                      Popular
-                    </Badge>
-                  )}
                 </div>
                 {item.description && <p className="text-xs text-gray-500 mt-1">{item.description}</p>}
               </div>
               <ChevronRight
                 className={`w-4 h-4 text-gray-400 transition-all duration-300 ${
-                  isExpanded ? "rotate-90 text-orange-500" : ""
+                  isExpanded ? "rotate-90 text-secondary" : ""
                 }`}
               />
             </button>
@@ -383,7 +362,7 @@ export default function ImprovedNavbar() {
               {item.icon && (
                 <div
                   className={`p-2 rounded-lg transition-all duration-300 ${
-                    isActive(item.href) ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-600"
+                    isActive(item.href) ? "bg-secondary/10 text-secondary" : "bg-gray-100 text-gray-600"
                   }`}
                 >
                   {item.icon}
@@ -392,13 +371,6 @@ export default function ImprovedNavbar() {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{item.name}</span>
-                  {item.isNew && <Badge className="text-xs px-2 py-0.5 bg-green-500">New</Badge>}
-                  {item.isPopular && (
-                    <Badge variant="outline" className="text-xs px-2 py-0.5 border-orange-300 text-orange-600">
-                      <Star className="w-3 h-3 mr-1" />
-                      Popular
-                    </Badge>
-                  )}
                 </div>
                 {item.description && <p className="text-xs text-gray-500 mt-1">{item.description}</p>}
               </div>
@@ -414,19 +386,13 @@ export default function ImprovedNavbar() {
                 href={child.href}
                 onClick={() => setIsMenuOpen(false)}
                 className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 hover:bg-gray-50 ${
-                  isActive(child.href) ? "bg-orange-50 text-orange-600" : ""
+                  isActive(child.href) ? "bg-secondary/10 text-secondary" : ""
                 }`}
               >
-                <div className={`w-2 h-2 rounded-full ${isActive(child.href) ? "bg-orange-500" : "bg-gray-300"}`} />
+                <div className={`w-2 h-2 rounded-full ${isActive(child.href) ? "bg-secondary" : "bg-gray-300"}`} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">{child.name}</span>
-                    {child.isNew && <Badge className="text-xs px-1.5 py-0.5 bg-green-500">New</Badge>}
-                    {child.isPopular && (
-                      <Badge variant="outline" className="text-xs px-1.5 py-0.5 border-orange-300 text-orange-600">
-                        <Star className="w-2.5 h-2.5 mr-1" />
-                      </Badge>
-                    )}
                   </div>
                   {child.description && <p className="text-xs text-gray-500 mt-0.5">{child.description}</p>}
                 </div>
@@ -471,12 +437,11 @@ export default function ImprovedNavbar() {
                       trigger={
                         <Button
                           variant="ghost"
-                          className={`flex items-center gap-1.5 text-sm font-medium transition-all duration-300 hover:bg-orange-50 hover:scale-105 px-3 py-2 h-9 ${
-                            isActive(item.href) ? "text-orange-600 bg-orange-50" : ""
+                          className={`flex items-center gap-1.5 text-sm font-medium transition-all duration-300 hover:bg-secondary/10 hover:scale-105 px-3 py-2 h-9 ${
+                            isActive(item.href) ? "text-secondary bg-secondary/10" : ""
                           }`}
                         >
                           <span>{item.name}</span>
-                          {item.isNew && <Badge className="text-xs px-1.5 py-0.5 ml-1 bg-green-500">New</Badge>}
                           <ChevronDown
                             className={`h-3.5 w-3.5 transition-transform duration-300 ml-0.5 ${
                               activeDropdown === item.name ? "rotate-180" : ""
@@ -495,27 +460,18 @@ export default function ImprovedNavbar() {
                             key={child.href}
                             href={child.href}
                             className={`flex items-center gap-3 w-full p-3 transition-colors rounded-lg mx-1 hover:bg-gray-50 ${
-                              isActive(child.href) ? "text-orange-600 bg-orange-50" : ""
+                              isActive(child.href) ? "text-secondary bg-secondary/10" : ""
                             }`}
                             onClick={() => setActiveDropdown(null)}
                           >
                             <div
                               className={`w-2 h-2 rounded-full ${
-                                isActive(child.href) ? "bg-orange-500" : "bg-gray-300"
+                                isActive(child.href) ? "bg-secondary" : "bg-gray-300"
                               }`}
                             />
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-sm">{child.name}</span>
-                                {child.isNew && <Badge className="text-xs px-1.5 py-0.5 bg-green-500">New</Badge>}
-                                {child.isPopular && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs px-1.5 py-0.5 border-orange-300 text-orange-600"
-                                  >
-                                    <Star className="w-2.5 h-2.5 mr-1" />
-                                  </Badge>
-                                )}
                               </div>
                               {child.description && <p className="text-xs text-gray-500 mt-0.5">{child.description}</p>}
                             </div>
@@ -529,12 +485,11 @@ export default function ImprovedNavbar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 hover:bg-orange-50 hover:scale-105 flex items-center gap-1.5 h-9 ${
-                      isActive(item.href) ? "text-orange-600 bg-orange-50" : ""
+                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:scale-105 flex items-center gap-1.5 h-9 ${
+                      isActive(item.href) ? "text-secondary bg-secondary/10" : ""
                     }`}
                   >
                     <span>{item.name}</span>
-                    {item.isNew && <Badge className="text-xs px-1.5 py-0.5 bg-green-500">New</Badge>}
                   </Link>
                 )
               })}
@@ -546,7 +501,7 @@ export default function ImprovedNavbar() {
                 trigger={
                   <Button
                     variant="ghost"
-                    className="flex items-center gap-1.5 text-sm font-medium transition-all duration-300 hover:bg-orange-50 hover:scale-105 px-3 py-2 h-9"
+                    className="flex items-center gap-1.5 text-sm font-medium transition-all duration-300 hover:bg-secondary/10 hover:scale-105 px-3 py-2 h-9"
                   >
                     <span>More</span>
                     <ChevronDown
@@ -563,7 +518,7 @@ export default function ImprovedNavbar() {
                       key={item.href}
                       href={item.href}
                       className={`flex items-center gap-3 w-full p-3 transition-colors rounded-lg mx-1 hover:bg-gray-50 ${
-                        isActive(item.href) ? "text-orange-600 bg-orange-50" : ""
+                        isActive(item.href) ? "text-secondary bg-secondary/10" : ""
                       }`}
                       onClick={() => setActiveDropdown(null)}
                     >
@@ -625,7 +580,7 @@ export default function ImprovedNavbar() {
                         >
                           <div
                             className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                              !notification.read ? "bg-orange-500" : "bg-gray-300"
+                              !notification.read ? "bg-secondary" : "bg-gray-300"
                             }`}
                           />
                           <div className="flex-1 min-w-0">
@@ -652,7 +607,7 @@ export default function ImprovedNavbar() {
                         src={user.avatar}
                         alt={user.name}
                         fallback={user.name.charAt(0)}
-                        className="w-7 h-7 ring-2 ring-transparent hover:ring-orange-200 transition-all duration-300"
+                        className="w-7 h-7 ring-2 ring-transparent hover:ring-secondary transition-all duration-300"
                       />
                       <div className="hidden xl:block text-left">
                         <p className="text-sm font-medium leading-none">{user.name}</p>
@@ -764,8 +719,8 @@ export default function ImprovedNavbar() {
               href={item.href}
               className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 min-w-[70px] ${
                 isActive(item.href)
-                  ? "text-orange-600 bg-orange-50 scale-105"
-                  : "text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+                  ? "text-secondary bg-secondary/10 scale-105"
+                  : "text-gray-600 hover:text-secondary hover:bg-secondary/10"
               }`}
             >
               {item.icon}
@@ -778,8 +733,8 @@ export default function ImprovedNavbar() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 min-w-[70px] ${
               isMenuOpen
-                ? "text-orange-600 bg-orange-50 scale-105"
-                : "text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+                ? "text-secondary bg-secondary/10 scale-105"
+                : "text-gray-600 hover:text-secondary hover:bg-secondary/10"
             }`}
           >
             <Menu className="w-5 h-5" />
@@ -808,12 +763,12 @@ export default function ImprovedNavbar() {
               {/* User Profile Section */}
               {user.isLoggedIn && (
                 <div className="p-4 border-b border-gray-200">
-                  <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
+                  <div className="flex items-center gap-3 p-3 bg-secondary/10 rounded-xl">
                     <Avatar
                       src={user.avatar}
                       alt={user.name}
                       fallback={user.name.charAt(0)}
-                      className="w-12 h-12 ring-2 ring-orange-200"
+                      className="w-12 h-12 ring-2 ring-secondary"
                     />
                     <div className="flex-1">
                       <p className="font-semibold text-gray-900">{user.name}</p>
@@ -898,8 +853,7 @@ export default function ImprovedNavbar() {
         </div>
       )}
 
-      {/* Spacer for mobile bottom bar */}
-      <div className="lg:hidden h-20" />
+    
     </>
   )
 }

@@ -1,16 +1,21 @@
 "use client"
 
 import { useState } from "react"
-
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, ChevronDown } from "lucide-react"
+import { Menu, ChevronDown, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, isAuthenticated, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
@@ -22,6 +27,9 @@ export default function Navbar() {
         <nav className="hidden md:flex ml-auto gap-6">
           <Link href="/" className="text-sm font-medium hover:text-red-600 transition-colors">
             Home
+          </Link>
+          <Link href="/packages" className="text-sm font-medium hover:text-red-600 transition-colors">
+            Packages
           </Link>
           <Link href="/about" className="text-sm font-medium hover:text-red-600 transition-colors">
             About Us
@@ -78,9 +86,41 @@ export default function Navbar() {
           </Link>
         </nav>
         <div className="hidden md:flex items-center gap-4 ml-6">
-          <Link href="/signin">
-            <Button className="bg-red-600 hover:bg-red-700">Sign In</Button>
-          </Link>
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {user?.firstName || 'Account'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">My Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile?tab=bookings">My Bookings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile?tab=favorites">Favorites</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="outline">Login</Button>
+              </Link>
+              <Link href="/register">
+                <Button className="bg-red-600 hover:bg-red-700">Sign Up</Button>
+              </Link>
+            </div>
+          )}
         </div>
         <Sheet>
           <SheetTrigger asChild>
@@ -93,6 +133,9 @@ export default function Navbar() {
             <div className="flex flex-col gap-6 mt-6">
               <Link href="/" className="text-lg font-medium">
                 Home
+              </Link>
+              <Link href="/packages" className="text-lg font-medium">
+                Packages
               </Link>
               <Link href="/about" className="text-lg font-medium">
                 About Us
@@ -143,9 +186,34 @@ export default function Navbar() {
               <Link href="/contact" className="text-lg font-medium">
                 Contact Us
               </Link>
-              <Link href="/signin" className="mt-4">
-                <Button className="w-full bg-red-600 hover:bg-red-700">Sign In</Button>
-              </Link>
+              
+              {isAuthenticated ? (
+                <div className="space-y-2">
+                  <Link href="/profile" className="block text-lg font-medium">
+                    My Profile
+                  </Link>
+                  <Link href="/profile?tab=bookings" className="block text-lg font-medium">
+                    My Bookings
+                  </Link>
+                  <Button 
+                    onClick={handleLogout} 
+                    variant="outline" 
+                    className="w-full text-red-600"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Link href="/login">
+                    <Button variant="outline" className="w-full">Login</Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button className="w-full bg-red-600 hover:bg-red-700">Sign Up</Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </SheetContent>
         </Sheet>

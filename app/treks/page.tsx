@@ -1,11 +1,68 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Calendar, MapPin, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useEffect, useState } from "react"
+import apiService from "@/lib/services/api-service"
 
 export default function TreksPage() {
+  const [allTreks, setAllTreks] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [category, setCategory] = useState<{ name: string; description: string } | null>(null)
+
+  useEffect(() => {
+    setIsLoading(true)
+    apiService.getPackages({ category: "Trekking" })
+      .then((data) => {
+        setAllTreks((data.data || []).map(mapTrekData))
+      })
+      .catch(() => setAllTreks([]))
+      .finally(() => setIsLoading(false))
+    // Fetch categories and set the Trekking category
+    apiService.request('/categories')
+      .then((data) => {
+        if (data && data.data && Array.isArray(data.data)) {
+          const trekCat = data.data.find((cat: any) => cat.name.toLowerCase() === 'trekking')
+          if (trekCat) setCategory({ name: trekCat.name, description: trekCat.description })
+        }
+      })
+      .catch(() => setCategory(null))
+  }, [])
+
+  function mapTrekData(apiTrek: any) {
+    // Use cardImage if available, else fallback
+    let image = '/placeholder.svg';
+    if (apiTrek.images) {
+      if (typeof apiTrek.images === 'object' && 'cardImage' in apiTrek.images) {
+        image = apiTrek.images.cardImage || image;
+      } else if (Array.isArray(apiTrek.images) && apiTrek.images.length > 0) {
+        image = apiTrek.images[0];
+      }
+    }
+    // Use offerPrice if price is missing
+    const price = apiTrek.offerPrice || apiTrek.price || 0;
+    // Use inclusions as tags if available
+    const tags = apiTrek.inclusions || [];
+    // Use seasons if available, else empty array
+    const seasons = apiTrek.seasons || [];
+    return {
+      slug: apiTrek.slug || apiTrek._id,
+      title: apiTrek.name || 'Trek',
+      location: apiTrek.location || apiTrek.city || apiTrek.state || '',
+      duration: apiTrek.duration || 'N/A',
+      difficulty: apiTrek.difficulty || 'Easy',
+      price: `₹${price.toLocaleString()}`,
+      image,
+      isPopular: apiTrek.isPopular !== undefined ? apiTrek.isPopular : true,
+      tags: tags.slice(0, 3),
+      seasons,
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -19,8 +76,12 @@ export default function TreksPage() {
         />
         <div className="container relative z-10 px-4 md:px-6">
           <div className="max-w-3xl space-y-4">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">Our Treks</h1>
-            <p className="text-xl text-white/90">Discover the best trekking experiences across India</p>
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+              {category ? category.name : "Our Treks"}
+            </h1>
+            <p className="text-xl text-white/90">
+              {category ? category.description : "Discover the best trekking experiences across India"}
+            </p>
           </div>
         </div>
       </section>
@@ -31,19 +92,23 @@ export default function TreksPage() {
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
               <TabsTrigger value="all">All Treks</TabsTrigger>
-              <TabsTrigger value="winter">Winter Treks</TabsTrigger>
+              {/* <TabsTrigger value="winter">Winter Treks</TabsTrigger>
               <TabsTrigger value="summer">Summer Treks</TabsTrigger>
               <TabsTrigger value="monsoon">Monsoon Treks</TabsTrigger>
-              <TabsTrigger value="weekend">Weekend Treks</TabsTrigger>
+              <TabsTrigger value="weekend">Weekend Treks</TabsTrigger> */}
             </TabsList>
 
             <div className="mt-8">
               <TabsContent value="all" className="mt-0">
+                {isLoading ? (
+                  <div className="text-center py-12 text-lg">Loading treks...</div>
+                ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {allTreks.map((trek) => (
                     <TrekCard key={trek.slug} trek={trek} />
                   ))}
                 </div>
+                )}
               </TabsContent>
 
               <TabsContent value="winter" className="mt-0">
@@ -182,7 +247,7 @@ function TrekCard({ trek }: TrekCardProps) {
     <div className="group relative overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md">
       {trek.isPopular && (
         <div className="absolute top-4 left-4 z-20">
-          <span className="inline-block bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">POPULAR</span>
+          <span className="inline-block bg-[hsl(var(--secondary))] text-white text-xs font-bold px-2 py-1 rounded">POPULAR</span>
         </div>
       )}
       <div className="relative h-60 w-full overflow-hidden">
@@ -192,7 +257,7 @@ function TrekCard({ trek }: TrekCardProps) {
           fill
           className="object-cover transition-transform group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--primary))]/80 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
           <h3 className="text-xl font-bold text-white">{trek.title}</h3>
           <div className="flex items-center gap-2 text-white/90 text-sm mt-1">
@@ -204,28 +269,28 @@ function TrekCard({ trek }: TrekCardProps) {
       <div className="p-4">
         <div className="flex flex-wrap gap-2 mb-3">
           {trek.tags.map((tag, index) => (
-            <Badge key={index} variant="outline" className="bg-gray-100">
+            <Badge key={index} variant="outline" className="bg-[hsl(var(--muted))] text-[hsl(var(--primary))] border-[hsl(var(--primary))]">
               {tag}
             </Badge>
           ))}
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-[hsl(var(--primary))]/80">
             <Calendar className="h-4 w-4" />
             <span>{trek.duration} Days</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-[hsl(var(--primary))]/80">
             <Users className="h-4 w-4" />
             <span>Difficulty: {trek.difficulty}</span>
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between">
           <div>
-            <span className="text-sm text-gray-500">Starting from</span>
-            <p className="text-lg font-bold text-red-600">{trek.price}</p>
+            <span className="text-sm text-[hsl(var(--primary))]/70">Starting from</span>
+            <p className="text-lg font-bold text-[hsl(var(--secondary))]">{trek.price}</p>
           </div>
           <Link href={`/treks/${trek.slug}`}>
-            <Button size="sm" className="bg-red-600 hover:bg-red-700">
+            <Button size="sm" className="bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))]/90 text-white">
               View Details
             </Button>
           </Link>
@@ -263,152 +328,5 @@ const destinations = [
     slug: "sikkim-northeast",
     description: "Eastern Himalayan gems with diverse flora and fauna",
     image: "/placeholder.svg?height=600&width=800&query=sikkim mountains kanchenjunga landscape",
-  },
-]
-
-const allTreks = [
-  {
-    slug: "kedarkantha-trek",
-    title: "Kedarkantha Trek",
-    location: "Uttarkashi, Uttarakhand",
-    duration: 6,
-    difficulty: "Easy-Moderate",
-    price: "₹8,999",
-    image: "/placeholder.svg?height=600&width=800&query=kedarkantha trek snow mountains uttarakhand",
-    isPopular: true,
-    tags: ["Winter Trek", "Snow Trek", "Summit Trek"],
-    seasons: ["Winter"],
-  },
-  {
-    slug: "brahmatal-trek",
-    title: "Brahmatal Trek",
-    location: "Chamoli, Uttarakhand",
-    duration: 6,
-    difficulty: "Moderate",
-    price: "₹9,499",
-    image: "/placeholder.svg?height=600&width=800&query=brahmatal trek uttarakhand snow mountains",
-    isPopular: true,
-    tags: ["Winter Trek", "Lake Trek", "Forest Trek"],
-    seasons: ["Winter"],
-  },
-  {
-    slug: "har-ki-dun-trek",
-    title: "Har Ki Dun Trek",
-    location: "Uttarkashi, Uttarakhand",
-    duration: 8,
-    difficulty: "Moderate",
-    price: "₹12,999",
-    image: "/placeholder.svg?height=600&width=800&query=har ki dun valley trek uttarakhand",
-    isPopular: true,
-    tags: ["Valley Trek", "Cultural Trek", "Summer Trek"],
-    seasons: ["Summer", "Autumn"],
-  },
-  {
-    slug: "valley-of-flowers-trek",
-    title: "Valley of Flowers Trek",
-    location: "Chamoli, Uttarakhand",
-    duration: 6,
-    difficulty: "Easy-Moderate",
-    price: "₹9,999",
-    image: "/placeholder.svg?height=600&width=800&query=valley of flowers uttarakhand monsoon",
-    isPopular: false,
-    tags: ["Monsoon Trek", "UNESCO Site", "Flower Valley"],
-    seasons: ["Monsoon"],
-  },
-  {
-    slug: "roopkund-trek",
-    title: "Roopkund Trek",
-    location: "Chamoli, Uttarakhand",
-    duration: 8,
-    difficulty: "Difficult",
-    price: "₹14,999",
-    image: "/placeholder.svg?height=600&width=800&query=roopkund trek skeleton lake uttarakhand",
-    isPopular: false,
-    tags: ["Mystery Lake", "High Altitude", "Challenging"],
-    seasons: ["Summer", "Autumn"],
-  },
-  {
-    slug: "dayara-bugyal-trek",
-    title: "Dayara Bugyal Trek",
-    location: "Uttarkashi, Uttarakhand",
-    duration: 5,
-    difficulty: "Easy",
-    price: "₹7,999",
-    image: "/placeholder.svg?height=600&width=800&query=dayara bugyal meadows uttarakhand",
-    isPopular: false,
-    tags: ["Meadow Trek", "Beginner Friendly", "Weekend Trek"],
-    seasons: ["Summer", "Winter"],
-  },
-  {
-    slug: "chopta-chandrashila-trek",
-    title: "Chopta Chandrashila Trek",
-    location: "Rudraprayag, Uttarakhand",
-    duration: 5,
-    difficulty: "Easy-Moderate",
-    price: "₹8,499",
-    image: "/placeholder.svg?height=600&width=800&query=chopta chandrashila tungnath temple trek",
-    isPopular: false,
-    tags: ["Temple Trek", "Summit Trek", "Weekend Trek"],
-    seasons: ["Summer", "Winter"],
-  },
-  {
-    slug: "kuari-pass-trek",
-    title: "Kuari Pass Trek",
-    location: "Chamoli, Uttarakhand",
-    duration: 6,
-    difficulty: "Moderate",
-    price: "₹9,999",
-    image: "/placeholder.svg?height=600&width=800&query=kuari pass trek uttarakhand nanda devi view",
-    isPopular: false,
-    tags: ["Mountain Pass", "Panoramic Views", "Lord Curzon Trail"],
-    seasons: ["Summer", "Winter"],
-  },
-  {
-    slug: "nag-tibba-trek",
-    title: "Nag Tibba Trek",
-    location: "Tehri Garhwal, Uttarakhand",
-    duration: 2,
-    difficulty: "Easy",
-    price: "₹4,999",
-    image: "/placeholder.svg?height=600&width=800&query=nag tibba trek weekend uttarakhand",
-    isPopular: false,
-    tags: ["Weekend Trek", "Beginner Friendly", "Summit Trek"],
-    seasons: ["Summer", "Winter", "Autumn"],
-  },
-  {
-    slug: "hampta-pass-trek",
-    title: "Hampta Pass Trek",
-    location: "Kullu, Himachal Pradesh",
-    duration: 5,
-    difficulty: "Moderate",
-    price: "₹9,999",
-    image: "/placeholder.svg?height=600&width=800&query=hampta pass trek himachal pradesh",
-    isPopular: false,
-    tags: ["Mountain Pass", "Contrasting Landscapes", "Chandratal Lake"],
-    seasons: ["Summer", "Monsoon"],
-  },
-  {
-    slug: "beas-kund-trek",
-    title: "Beas Kund Trek",
-    location: "Manali, Himachal Pradesh",
-    duration: 4,
-    difficulty: "Easy",
-    price: "₹6,999",
-    image: "/placeholder.svg?height=600&width=800&query=beas kund trek manali himachal pradesh",
-    isPopular: false,
-    tags: ["Glacial Lake", "Beginner Friendly", "Weekend Trek"],
-    seasons: ["Summer", "Monsoon"],
-  },
-  {
-    slug: "kashmir-great-lakes-trek",
-    title: "Kashmir Great Lakes Trek",
-    location: "Sonamarg, Kashmir",
-    duration: 7,
-    difficulty: "Moderate-Difficult",
-    price: "₹15,999",
-    image: "/placeholder.svg?height=600&width=800&query=kashmir great lakes trek alpine lakes",
-    isPopular: true,
-    tags: ["Alpine Lakes", "Meadows", "High Altitude"],
-    seasons: ["Summer"],
   },
 ]

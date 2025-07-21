@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from "react";
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, Calendar, MapPin, Mountain, Users } from "lucide-react"
@@ -12,101 +15,78 @@ import PackagesCarousel from "@/components/packages-carousel"
 import ModernStatsSection from "@/components/ui/modern-stats-section"
 import CharDhamSection from "@/components/modern-char-dham-carousel"
 import TrekSection from "@/components/modern-popular-treks-carousel"
+import apiService from "@/lib/services/api-service"
+import { useToast } from "@/hooks/use-toast"
+
+interface Package {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  duration: number;
+  location: string;
+  images: string[];
+  category: string;
+  rating: number;
+  reviews: number;
+  slug?: string;
+}
 
 export default function Home() {
- 
+  const { toast } = useToast();
+  const [featuredPackages, setFeaturedPackages] = useState<Package[]>([]);
+  const [trendingPackages, setTrendingPackages] = useState<Package[]>([]);
+  const [newPackages, setNewPackages] = useState<Package[]>([]);
+  const [topRatedPackages, setTopRatedPackages] = useState<Package[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const charDhamPackages = [
-    {
-      slug: "standard-char-dham",
-      title: "Standard Char Dham Package",
-      subtitle: "Complete pilgrimage by road",
-      image: "https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "12 Days",
-      location: "Uttarakhand",
-      price: "₹45,999",
-      highlights: [
-        "Visit all four Dhams: Yamunotri, Gangotri, Kedarnath, and Badrinath",
-        "Comfortable accommodation throughout the journey",
-        "Experienced guides and assistance",
-        "All meals and transportation included",
-      ],
-    },
-    {
-      slug: "helicopter-char-dham",
-      title: "Helicopter Char Dham Package",
-      subtitle: "Premium aerial pilgrimage",
-      image: "https://images.pexels.com/photos/2387876/pexels-photo-2387876.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "7 Days",
-      location: "Uttarakhand",
-      price: "₹1,85,000",
-      highlights: [
-        "Helicopter rides to all four Dhams",
-        "Luxury accommodation in the best available hotels",
-        "VIP darshan arrangements at all temples",
-        "Personal guide and assistance throughout",
-      ],
-    },
-    {
-      slug: "senior-citizen-char-dham",
-      title: "Senior Citizen Char Dham Package",
-      subtitle: "Comfortable journey for elders",
-      image: "https://images.pexels.com/photos/1761279/pexels-photo-1761279.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "14 Days",
-      location: "Uttarakhand",
-      price: "₹55,999",
-      highlights: [
-        "Slower-paced itinerary with more rest days",
-        "Medical assistance throughout the journey",
-        "Comfortable accommodation with accessibility features",
-        "Special assistance for temple visits",
-      ],
-    },
-    {
-      slug: "do-dham-yatra",
-      title: "Do Dham Yatra Package",
-      subtitle: "Kedarnath & Badrinath",
-      image: "https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "8 Days",
-      location: "Uttarakhand",
-      price: "₹32,999",
-      highlights: [
-        "Visit to Kedarnath and Badrinath temples",
-        "Comfortable accommodation throughout",
-        "All meals and transportation included",
-        "Experienced guides and assistance",
-      ],
-    },
-    {
-      slug: "custom-char-dham",
-      title: "Custom Char Dham Package",
-      subtitle: "Tailored to your preferences",
-      image: "https://images.pexels.com/photos/2387876/pexels-photo-2387876.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "Flexible",
-      location: "Uttarakhand",
-      price: "₹60,000+",
-      highlights: [
-        "Customized itinerary based on your preferences",
-        "Choice of accommodation and transportation",
-        "Flexible departure dates",
-        "Additional sightseeing options available",
-      ],
-    },
-  ]
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      setIsLoading(true);
+      // Fetch different types of packages in parallel
+      const [featured, trending, newPkgs, topRated] = await Promise.all([
+        apiService.getFeaturedPackages(),
+        apiService.getTrendingPackages(),
+        apiService.getNewPackages(),
+        apiService.getTopRatedPackages(),
+      ]);
+      setFeaturedPackages(featured.data || []);
+      setTrendingPackages(trending.data || []);
+      setNewPackages(newPkgs.data || []);
+      setTopRatedPackages(topRated.data || []);
+    } catch (error) {
+      console.error('Failed to fetch packages:', error);
+      setFeaturedPackages([]);
+      setTrendingPackages([]);
+      setNewPackages([]);
+      setTopRatedPackages([]);
+      toast({
+        title: 'Error',
+        description: 'Failed to load packages. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // No fallbackCharDhamPackages or any other static data here
 
   return (
     <div className="flex min-h-screen flex-col">
       {/* Hero Section with Swiper Carousel */}
-      <HeroSection  />
-
-     <ModernStatsSection/>
-
-     <CharDhamSection/>
-
-     <TrekSection/>
-
+      <HeroSection />
+      <ModernStatsSection />
+      {/* Char Dham Section - Only real API data */}
+      <CharDhamSection />
+      {/* Trek Section - Only real API data */}
+      <TrekSection />
       {/* Featured Destinations */}
-      <section className="bg-light py-20">
+      {/* <section className="bg-light py-20">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-6 text-center mb-8">
             <div className="space-y-2">
@@ -122,10 +102,9 @@ export default function Home() {
             <FeaturedDestinations />
           </div>
         </div>
-      </section>
-
+      </section> */}
       {/* Adventure Categories */}
-      <section className="bg-white py-20">
+      {/* <section className="bg-white py-20">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-6 text-center mb-8">
             <div className="space-y-2">
@@ -141,20 +120,55 @@ export default function Home() {
             <AdventureCategories />
           </div>
         </div>
-      </section>
-
+      </section> */}
+      {/* Featured Packages Section */}
+      {!isLoading && featuredPackages.length > 0 && (
+        <section className="bg-light py-20">
+          <div className="container px-4 md:px-6">
+            <div className="rounded-2xl bg-white shadow-lg p-8">
+              <PackagesCarousel 
+                packages={featuredPackages} 
+                title="Popular Packages"
+                subtitle="Handpicked adventures for the ultimate experience"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+      {/* Trending Packages Section */}
+      {!isLoading && trendingPackages.length > 0 && (
+        <section className="bg-white py-20">
+          <div className="container px-4 md:px-6">
+            <div className="rounded-2xl bg-light shadow-lg p-8">
+              <PackagesCarousel 
+                packages={trendingPackages} 
+                title="Trending Now"
+                subtitle="Most popular packages this season"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+      {/* New Packages Section */}
+      {!isLoading && newPackages.length > 0 && (
+        <section className="bg-light py-20">
+          <div className="container px-4 md:px-6">
+            <div className="rounded-2xl bg-white shadow-lg p-8">
+              <PackagesCarousel 
+                packages={newPackages} 
+                title="New Arrivals"
+                subtitle="Fresh adventures waiting for you"
+              />
+            </div>
+          </div>
+        </section>
+      )}
       {/* Testimonials */}
-     
-            <TestimonialCarousel />
-         
-     
-
-    
-
+      <TestimonialCarousel />
       {/* WhatsApp Button */}
       <WhatsAppButton />
     </div>
-  )
+  );
 }
 
 

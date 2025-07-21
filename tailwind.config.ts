@@ -25,14 +25,8 @@ const config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "#1A237E",
-          foreground: "#fff",
-        },
-        secondary: {
-          DEFAULT: "#4F8FF0",
-          foreground: "#fff",
-        },
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
         accent: {
           DEFAULT: "#FF9800",
           foreground: "#fff",
